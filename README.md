@@ -142,31 +142,31 @@ LLM_MODEL=qwen3.5-plus
 ### 第四步：注册到 OpenClaw 并重启网关
 要在系统中启用这个后台插件，你必须将其注册到 OpenClaw 的核心中。
 1. 打开 OpenClaw 的总配置文件：`~/.openclaw/openclaw.json`。
-2. 找到 `plugins` 节点，并在 `entries` 字典下宣告启用（加上 `neo4j-memory`）：
+2. 找到您的 `"plugins": { ... }` 节点所在位置，直接参考下方这张**完整的模板**修改即可（注意将 `installPath` 中的用户名换成您自己的）：
+
 ```json
 "plugins": {
+  "allow": ["neo4j-memory"],
   "entries": {
     "neo4j-memory": {
       "enabled": true
     }
   },
-```
-3. 继续往下，在 `installs` 字典里，配置插件的本地绝对挂载路径（**注意替换其中的 `bilzeng` 为你自己的电脑用户名**）：
-```json
   "installs": {
     "neo4j-memory": {
-      "source": "local",
+      "source": "path",
       "spec": "file:./extensions/neo4j-memory",
-      "installPath": "/Users/bilzeng/.openclaw/extensions/neo4j-memory",
+      "installPath": "/Users/您的电脑用户名/.openclaw/extensions/neo4j-memory",
       "version": "1.0.0",
-      "resolvedName": "neo4j-memory",
+      "resolvedName": "@openclaw/neo4j-memory",
       "resolvedVersion": "1.0.0",
       "resolvedSpec": "file:./extensions/neo4j-memory"
     }
   }
 }
 ```
-4. 彻底杀掉并重启 OpenClaw 后台网关以挂载核心 RAG 拦截器：
+
+3. 彻底杀掉并重启 OpenClaw 后台网关以挂载核心 RAG 拦截器：
 ```bash
 # 重启网关进程
 openclaw gateway
