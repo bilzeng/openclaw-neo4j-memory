@@ -1,0 +1,14 @@
+{
+  "name": "@openclaw/neo4j-memory",
+  "version": "1.0.0",
+  "description": "Neo4j Graph Memory - 自动记录所有对话到知识图谱",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "neo4j-driver": "^5.18.0",
+    "openclaw": "latest"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "neo4j-memory",
+  "name": "Neo4j Memory",
+  "description": "上下文记忆检索、自动记录所有对话到 Neo4j 知识图谱，支持项目/模块/智能体自动识别",
+  "version": "1.0.0",
+  "author": "知微",
+  "license": "MIT",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}
