@@ -96,10 +96,27 @@ pip3 install -r requirements.txt
 > 2. 升级 pip：`python3 -m pip install --upgrade pip`
 > 3. 使用国内镜像源重试：`pip3 install -r requirements.txt -i https://mirror.baidu.com/pypi/simple`
 
-### 第二步：数据库启动
-启动并暴露本地的 Neo4j 环境（强烈推荐使用 Docker）：
-- 暴露端口: 7687 (bolt) & 7474 (http)
-- 默认账户与密码: `neo4j` / `password`
+### 第二步：部署 Neo4j 数据库
+本系统强依赖 Neo4j 数据库。您可以根据自身环境，选择 Docker 或者原生桌面版方式安装：
+
+#### 方案 A：使用 Docker 部署（强烈推荐，一键完成）
+如果您电脑上有 Docker，只需在终端执行这行代码即可：
+```bash
+docker run -d \
+    --name openclaw-neo4j \
+    -p 7474:7474 -p 7687:7687 \
+    -e NEO4J_AUTH=neo4j/password \
+    neo4j:latest
+```
+*启动后，数据库默认账号为 `neo4j`，密码为 `password`。*
+
+#### 方案 B：无 Docker 物理机本地安装（Mac / Windows适用）
+如果您不想折腾 Docker，可以使用官方小白图形化客户端：
+1. 访问 [Neo4j Desktop 官网](https://neo4j.com/download/) 免费下载桌面端。
+2. 安装并打开 Neo4j Desktop 后，点击左侧项目面板的 **"New" -> "Create Local DBMS"**。
+3. 设置您的数据库密码（比如设为 `password`），数据库版本保持默认即可。
+4. 点击新创建的数据库右侧的 **Start** 按钮将其启动。
+*(同样默认监听本地 `7687` (bolt) 和 `7474` (浏览器测试界面) 端口)*
 
 ### 第三步：拷贝并配置 .env 环境变量（关键核心！）
 为了保护您的隐私密钥，插件现在完全实现了密码与代码的脱钩。
