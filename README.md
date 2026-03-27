@@ -140,14 +140,39 @@ LLM_MODEL=qwen3.5-plus
 ```
 
 ### 第四步：注册到 OpenClaw 并重启网关
-1. 打开 OpenClaw 的总配置文件 `~/.openclaw/openclaw.json`。
-2. 确保在 `plugins.entries` 和 `plugins.installs` 里有 `neo4j-memory` 的本地挂载路径（详情请见 OpenClaw 的 `plugin_development_guide.md`）。
-3. 彻底重启 OpenClaw 后台网关以挂载核心拦截器：
+要在系统中启用这个后台插件，你必须将其注册到 OpenClaw 的核心中。
+1. 打开 OpenClaw 的总配置文件：`~/.openclaw/openclaw.json`。
+2. 找到 `plugins` 节点，并在 `entries` 字典下宣告启用（加上 `neo4j-memory`）：
+```json
+"plugins": {
+  "entries": {
+    "neo4j-memory": {
+      "enabled": true
+    }
+  },
+```
+3. 继续往下，在 `installs` 字典里，配置插件的本地绝对挂载路径（**注意替换其中的 `bilzeng` 为你自己的电脑用户名**）：
+```json
+  "installs": {
+    "neo4j-memory": {
+      "source": "local",
+      "spec": "file:./extensions/neo4j-memory",
+      "installPath": "/Users/bilzeng/.openclaw/extensions/neo4j-memory",
+      "version": "1.0.0",
+      "resolvedName": "neo4j-memory",
+      "resolvedVersion": "1.0.0",
+      "resolvedSpec": "file:./extensions/neo4j-memory"
+    }
+  }
+}
+```
+4. 彻底杀掉并重启 OpenClaw 后台网关以挂载核心 RAG 拦截器：
 ```bash
-# 杀掉老网关并重新运行 (例如 pm2、或者前台运行)
+# 重启网关进程
 openclaw gateway
 ```
-启动后在飞书或本地对 Agent 发一句包含事实的断言（如“我爱吃什么？”或“测试：我明天要去南京”）。
+> **恭喜！至此已全部配置完成。**
+> 试着在聊天窗口对你的 Agent 发送一句包含事实的断言（如：“记住，我最爱吃红富士苹果”），即可前往 `http://localhost:7474` 见证它在脑海中为你建立真正的图谱神经！
 
 ## 🛝 验收与查询技巧
 
