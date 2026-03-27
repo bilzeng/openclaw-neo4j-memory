@@ -1,4 +1,4 @@
-# OpenClaw 动态事实图谱记忆插件 (V3 - Entity Spontaneous Graph)
+# OpenClaw 动态事实图谱记忆插件 (V4 - Entity Spontaneous Graph)
 
 > [!NOTE]
 > 本插件专为 OpenClaw 框架设计，提供了一个能随着对话“越聊越聪明”的企业级事实知识图谱（Fact Knowledge Graph）记忆底座。
@@ -9,7 +9,7 @@
 
 在 AI 助手的长期运行中，传统的历史记录通常以“对话流”或“文本检索块”的形式存在。这导致大模型很难跨越时间建立立体的关联记忆（例如：“昨天 Boss 新买了什么车？”和“今天 Boss 把哪辆车送给了财务？”）。
 
-`neo4j-memory` V3 版本是一场彻底的架构级跨越：
+`neo4j-memory` V4 版本是一场彻底的架构级跨越：
 它摒弃了“流水账节点”模式，在每一次与任意 Agent 对话结束后，会自动将你的长难句，通过大语言模型提取出 **Subject-Predicate-Object (SPO) 事实三元组**（实体-关系-被动实体），并以“网络节点 + 动态动词连线”的形式永久固化在 Neo4j 图数据库中。每一次的对话，都是在为你的系统织一张真实的世界关系大网！
 
 ---
@@ -17,15 +17,15 @@
 1. 自动构建：从对话到复杂图谱
 当你在和 Agent 聊天时，插件会自动提取实体（Entity）和关系（Relationship）。不再是零散的文本，而是像人类大脑一样建立起错综复杂的连接。
 🗨️ Agent 记忆现场,📊 同步生成的 Neo4j 图谱 (实测)
-![alt text](image.png)
+![alt text](file/image.png)
 图 1：实时生成的 300+ 节点、800+ 关系的知识网络
-![alt text](image-1.png)
+![alt text](file/image-1.png)
 图 2：Agent 记录 Boss 的居住地、朋友关系及偏好,
 2. 精准检索：基于路径的逻辑推理 (GraphRAG)
 由于数据以图的形式存储，Agent 可以进行“多跳搜索”。即使你问得很模糊，它也能顺着逻辑链条（如：李四 -> 居住于 -> 北京）给出精准答案。
-![alt text](image-2.png)
+![alt text](file/image-2.png)
 🔍 精准定位居住地,🐱 理解复杂的从属关系,
-![alt text](image-3.png)
+![alt text](file/image-3.png)
 即使信息繁杂，Agent 依然能秒回：李四在北京,Agent 能分清“毛球”是宠物而非地理位置
 
 🔥 为什么选这个插件？
@@ -76,9 +76,9 @@ flowchart TD
 
 ---
 
-## 🕸 图谱拓扑 (Schema V3)
+## 🕸 图谱拓扑 (Schema V4)
 
-V3 版本的图谱拓扑可以随心所欲生长。它原生包含两种结构：
+V4 版本的图谱拓扑可以随心所欲生长。它原生包含两种结构：
 
 ### 1. 系统智能体拓扑 (Static Topology)
 在插件首次挂载时，Neo4j 会被强行注入当前系统的 Agent 从属关系底座，用以保证后面的协作链路是可追溯的。
