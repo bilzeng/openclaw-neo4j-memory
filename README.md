@@ -1,7 +1,7 @@
 # OpenClaw 动态事实图谱记忆插件 (V4 - Entity Spontaneous Graph)
 
 > [!NOTE]
-> 本插件专为 OpenClaw 框架设计，提供了一个能随着对话“越聊越聪明”的企业级事实知识图谱（Fact Knowledge Graph）记忆底座。
+> 本插件专为 OpenClaw 框架设计，提供了一个能随着对话“越聊越聪明”的企业级实时知识图谱（Fact Knowledge Graph）记忆底座。
 
 ---
 
