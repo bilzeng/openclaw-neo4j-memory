@@ -91,12 +91,25 @@ export function register(api) {
       debugLog(`before_prompt_build hook fired for agent ${ctx.agentId || 'unknown'}`);
       
       let userMsg = event.prompt;
+      
+      // Fallback: If prompt is empty (e.g., during memory refresh/new session), try to get the last user message from conversation history
+      if (!userMsg && event.messages && Array.isArray(event.messages)) {
+          const lastMsgs = event.messages.filter(m => m.role === 'user');
+          if (lastMsgs.length > 0) {
+              userMsg = extractText(lastMsgs[lastMsgs.length - 1].content);
+          }
+      }
+      
       if (!userMsg) return;
       
       userMsg = sanitizeMessage(userMsg);
-      
       debugLog(`Checking RAG... prompt length: ${userMsg.length}, text: ${userMsg.substring(0, 30)}`);
       
+      // We ALWAYS inject the system guidance to constantly remind the agent about Neo4j,
+      // preventing it from falling back to local memory files during empty resets.
+      const systemGuidance = "=== NEO4J GRAPH MEMORY ===\nYou are connected to a Neo4j Knowledge Graph. All user preferences, relationship facts, and relevant historical context are securely stored there.\nIMPORTANT: Do NOT use the `memory_search` tool! Do NOT rely on local MEMORY.md files! Your memory is automatically fetched from Neo4j and injected straight into your prompt under the heading 【来自 Neo4j 大脑深处】.\nAlways rely directly on the facts provided in the injected section rather than searching locally.";
+      let injectedContext = "【来自 Neo4j 大脑深处】: 当前查询上下文中没有提取到相关的历史记忆。";
+
       if (userMsg.length > 0) {
           try {
               const scriptPath = path.join(__dirname, 'python', 'retrieve.py');
@@ -114,17 +127,18 @@ export function register(api) {
                   const contextText = stdoutData.trim();
                   if (contextText && contextText.length > 5 && !contextText.includes('NO_CONTEXT_FOUND')) {
                       debugLog(`✅ Injected RAG Context into prependContext & appendSystemContext`);
-                      return {
-                          appendSystemContext: "=== NEO4J GRAPH MEMORY ===\nYou are connected to a Neo4j Knowledge Graph. All user preferences, relationship facts, and relevant historical context are securely stored there.\nIMPORTANT: Do NOT use the `memory_search` tool! Do NOT rely on local MEMORY.md files! Your memory is automatically fetched from Neo4j and injected straight into your prompt under the heading 【来自 Neo4j 大脑深处】.\nAlways rely directly on the facts provided in the injected section rather than searching locally.",
-                          prependContext: `【来自 Neo4j 大脑深处的过往客观事实/尝试过的方案 (用于辅助分析推理和避坑)】:\n${contextText}\n\n【真实客观状态结束。】`
-                      };
+                      injectedContext = `【来自 Neo4j 大脑深处的过往客观事实/尝试过的方案 (用于辅助分析推理和避坑)】:\n${contextText}\n\n【真实客观状态结束。】`;
                   }
-
               }
           } catch (err) {
               debugLog('RAG Retrieval failed: ' + err.message);
           }
       }
+      
+      return {
+          appendSystemContext: systemGuidance,
+          prependContext: injectedContext
+      };
   });
   
   // V4 POST-CHAT RECORDING

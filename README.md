@@ -171,6 +171,9 @@ LLM_MODEL=qwen3.5-plus
 
 ```json
 "plugins": {
+  "slots": {
+    "memory": "neo4j-memory"  // 【关键】必须配置独占插槽，否则会和 OpenClaw 原生 memory_search 冲突！
+  },
   "allow": ["neo4j-memory"],
   "entries": {
     "neo4j-memory": {
