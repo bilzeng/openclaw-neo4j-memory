@@ -179,11 +179,11 @@ LLM_MODEL=qwen3.5-plus
   },
   "installs": {
     "neo4j-memory": {
-      "source": "local",
+      "source": "path",
       "spec": "file:./extensions/neo4j-memory",
       "installPath": "/Users/您的电脑用户名/.openclaw/extensions/neo4j-memory",
       "version": "1.0.0",
-      "resolvedName": "neo4j-memory",
+      "resolvedName": "@openclaw/neo4j-memory",
       "resolvedVersion": "1.0.0",
       "resolvedSpec": "file:./extensions/neo4j-memory"
     }
