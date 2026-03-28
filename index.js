@@ -59,8 +59,10 @@ export function register(api) {
   
   debugLog('register() called by OpenClaw');
   logger.info('[Neo4jMemoryNative] Registering hooks with native neo4j driver...');
+  debugLog('api.on signature: ' + String(api.on));
 
   const extractText = (content) => {
+
       if (!content) return '';
       if (typeof content === 'string') return content;
       if (Array.isArray(content)) {
@@ -85,23 +87,15 @@ export function register(api) {
   };
 
   // V4 PRE-CHAT RAG RETRIEVAL (All agents have full read access)
-  api.on('message_received', async (event, ctx) => {
-      debugLog('API methods: ' + Object.keys(api).join(', '));
-      debugLog('Event structure: ' + JSON.stringify(Object.keys(event)));
-      debugLog('Event context: ' + JSON.stringify(Object.keys(ctx)));
-      debugLog(`message_received hook fired for agent ${ctx.agentId || 'unknown'}`);
+  api.on('before_prompt_build', async (event, ctx) => {
+      debugLog(`before_prompt_build hook fired for agent ${ctx.agentId || 'unknown'}`);
       
-      let userMsgRaw = event.content || event.text;
-      if (!userMsgRaw) return;
+      let userMsg = event.prompt;
+      if (!userMsg) return;
       
-      let extractedText = extractText(userMsgRaw);
+      userMsg = sanitizeMessage(userMsg);
       
-      // 防止内部循环多次注入
-      if (extractedText.includes('【来自 Neo4j 大脑深处')) return;
-      
-      let userMsg = sanitizeMessage(extractedText);
-      
-      debugLog(`Checking RAG... userMsg length: ${userMsg.length}, text: ${userMsg.substring(0, 30)}`);
+      debugLog(`Checking RAG... prompt length: ${userMsg.length}, text: ${userMsg.substring(0, 30)}`);
       
       if (userMsg.length > 0) {
           try {
@@ -119,12 +113,13 @@ export function register(api) {
                   
                   const contextText = stdoutData.trim();
                   if (contextText && contextText.length > 5 && !contextText.includes('NO_CONTEXT_FOUND')) {
-                      // Mute the context directly on the event content
-                      const newPrompt = `【来自 Neo4j 大脑深处的过往客观事实/尝试过的方案 (用于辅助分析推理和避坑)】:\n${contextText}\n\n【真实客观状态结束。以下是真实用户的提问】:\n${userMsg}`;
-                      event.content = newPrompt;
-                      if (event.text !== undefined) event.text = newPrompt; 
-                      debugLog(`✅ Injected RAG Context into prompt`);
+                      debugLog(`✅ Injected RAG Context into prependContext & appendSystemContext`);
+                      return {
+                          appendSystemContext: "=== NEO4J GRAPH MEMORY ===\nYou are connected to a Neo4j Knowledge Graph. All user preferences, relationship facts, and relevant historical context are securely stored there.\nIMPORTANT: Do NOT use the `memory_search` tool! Do NOT rely on local MEMORY.md files! Your memory is automatically fetched from Neo4j and injected straight into your prompt under the heading 【来自 Neo4j 大脑深处】.\nAlways rely directly on the facts provided in the injected section rather than searching locally.",
+                          prependContext: `【来自 Neo4j 大脑深处的过往客观事实/尝试过的方案 (用于辅助分析推理和避坑)】:\n${contextText}\n\n【真实客观状态结束。】`
+                      };
                   }
+
               }
           } catch (err) {
               debugLog('RAG Retrieval failed: ' + err.message);

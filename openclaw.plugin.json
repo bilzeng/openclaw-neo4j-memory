@@ -5,6 +5,7 @@
   "version": "1.0.0",
   "author": "知微",
   "license": "MIT",
+  "kind": "memory",
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
