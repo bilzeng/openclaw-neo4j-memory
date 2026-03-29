@@ -50,13 +50,15 @@ def retrieve_context(query: str):
                    OR (size(s.name) > 1 AND $kw CONTAINS s.name)
                    OR (size(o.name) > 1 AND $kw CONTAINS o.name)
                    OR (size(type(r)) > 1 AND $kw CONTAINS type(r))
-                RETURN s.name, type(r), o.name
+                RETURN s.name, type(r), o.name, substring(toString(r.created_at), 0, 19) AS created_at
                 ORDER BY elementId(r) DESC
                 LIMIT 10
                 """
                 results = session.run(cypher, kw=kw)
                 for record in results:
-                    fact = f"已知客观情况或曾被尝试的方案：[{record[0]}] ---({record[1]})---> [{record[2]}]"
+                    date_str = record[3]
+                    prefix = f"[{date_str} 记录的客观情况]" if date_str else "[已知客观情况或历史方案]"
+                    fact = f"{prefix}：[{record[0]}] ---({record[1]})---> [{record[2]}]"
                     graph_facts.append(fact)
                     
         graph_facts = list(set(graph_facts)) # deduplicate
