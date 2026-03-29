@@ -107,7 +107,11 @@ export function register(api) {
       
       // We ALWAYS inject the system guidance to constantly remind the agent about Neo4j,
       // preventing it from falling back to local memory files during empty resets.
-      const systemGuidance = "=== NEO4J GRAPH MEMORY ===\nYou are connected to a Neo4j Knowledge Graph. All user preferences, relationship facts, and relevant historical context are securely stored there.\nIMPORTANT: Do NOT use the `memory_search` tool! Do NOT rely on local MEMORY.md files! Your memory is automatically fetched from Neo4j and injected straight into your prompt under the heading 【来自 Neo4j 大脑深处】.\nAlways rely directly on the facts provided in the injected section rather than searching locally.";
+      const currentTimestamp = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+      const systemGuidance = `=== NEO4J GRAPH MEMORY ===\nYou are connected to a Neo4j Knowledge Graph. All facts and historical context are injected below.
+IMPORTANT RULES:
+1. Do NOT use \`memory_search\` tool or rely on local MEMORY files. Your memory is ONLY the injected Neo4j content.
+2. ⚠️ TEMPORAL REASONING ⚠️: The injected facts contain absolute timestamps (e.g., [2026-03-28T15:07 记录]). The REAL current time right now is 【${currentTimestamp}】. If a historical record says things like "今天"(today) or "昨天"(yesterday), you MUST evaluate them relative to the record's timestamp! (e.g. if a March 28th record says "今天吃地锅鸡", it means they ate it on March 28th. If today is March 29th, then they ate it "昨天" yesterday!) NEVER blindly repeat "今天" from an old record!`;
       let injectedContext = "【来自 Neo4j 大脑深处】: 当前查询上下文中没有提取到相关的历史记忆。";
 
       if (userMsg.length > 0) {
