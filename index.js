@@ -1,12 +1,22 @@
 import fs from 'fs';
 import os from 'os';
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const pythonCmd = os.platform() === 'win32' ? 'python' : 'python3';
+
+function detectPython() {
+  try {
+    if (spawnSync('python3', ['--version']).status === 0) return 'python3';
+  } catch (e) {}
+  try {
+    if (spawnSync('python', ['--version']).status === 0) return 'python';
+  } catch (e) {}
+  return os.platform() === 'win32' ? 'python' : 'python3';
+}
+const pythonCmd = detectPython();
 let logger = console;
 const debugLog = (msg) => {
   try { fs.appendFileSync('/tmp/openclaw_neo4j_debug.log', new Date().toISOString() + ' ' + msg + '\n'); } catch(e){}
