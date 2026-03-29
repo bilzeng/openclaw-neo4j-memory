@@ -1,10 +1,12 @@
 import fs from 'fs';
+import os from 'os';
 import { spawn } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const pythonCmd = os.platform() === 'win32' ? 'python' : 'python3';
 let logger = console;
 const debugLog = (msg) => {
   try { fs.appendFileSync('/tmp/openclaw_neo4j_debug.log', new Date().toISOString() + ' ' + msg + '\n'); } catch(e){}
@@ -30,8 +32,7 @@ class Neo4jMemoryNativePlugin {
         response || '',
         agentId || 'main'
       ];
-      
-      const proc = spawn('python3', args);
+      const proc = spawn(pythonCmd, args);
       
       proc.stdout.on('data', (data) => {
         debugLog(`Python stdout: ${data}`);
@@ -119,7 +120,7 @@ IMPORTANT RULES:
               const scriptPath = path.join(__dirname, 'python', 'retrieve.py');
               if (fs.existsSync(scriptPath)) {
                   debugLog(`RAG retrieving context for: ${userMsg.substring(0, 20)}...`);
-                  const child = spawn('python3', [scriptPath, userMsg]);
+                  const child = spawn(pythonCmd, [scriptPath, userMsg]);
                   let stdoutData = '';
                   child.stdout.on('data', (d) => { stdoutData += d.toString(); });
                   
