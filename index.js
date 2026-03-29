@@ -42,7 +42,7 @@ class Neo4jMemoryNativePlugin {
         response || '',
         agentId || 'main'
       ];
-      const proc = spawn(pythonCmd, args);
+      const proc = spawn(pythonCmd, args, { env: { ...process.env, PYTHONIOENCODING: 'utf-8' } });
       
       proc.stdout.on('data', (data) => {
         debugLog(`Python stdout: ${data}`);
@@ -130,7 +130,7 @@ IMPORTANT RULES:
               const scriptPath = path.join(__dirname, 'python', 'retrieve.py');
               if (fs.existsSync(scriptPath)) {
                   debugLog(`RAG retrieving context for: ${userMsg.substring(0, 20)}...`);
-                  const child = spawn(pythonCmd, [scriptPath, userMsg]);
+                  const child = spawn(pythonCmd, [scriptPath, userMsg], { env: { ...process.env, PYTHONIOENCODING: 'utf-8' } });
                   let stdoutData = '';
                   child.stdout.on('data', (d) => { stdoutData += d.toString(); });
                   
